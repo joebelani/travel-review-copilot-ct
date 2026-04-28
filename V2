@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Review Co-Pilot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #FE2A5C 0%, #FF6B9D 50%, #FFA8C5 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-top: 1.5rem;
+        }
+        
+        .header-icon {
+            width: 64px;
+            height: 64px;
+            background: white;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 1.125rem;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .process-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .process-icon-wrapper {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+        
+        .process-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FE2A5C, #FF6B9D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-size: 1.75rem;
+        }
+        
+        .process-icon.green {
+            background: linear-gradient(135deg, #10B981, #34D399);
+        }
+        
+        .process-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FE2A5C;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .process-badge.green {
+            background: #10B981;
+        }
+        
+        .process-arrow {
+            font-size: 1.75rem;
+            color: #FE2A5C;
+            opacity: 0.5;
+            padding: 0 1rem;
+        }
+        
+        .process-title {
+            font-weight: bold;
+            color: #FE2A5C;
+            margin-bottom: 0.25rem;
+        }
+        
+        .process-title.green {
+            color: #10B981;
+        }
+        
+        .process-desc {
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FE2A5C, #FF6B9D);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #FE2A5C;
+        }
+        
+        .checkmark {
+            color: #10B981;
+            margin-left: auto;
+            font-size: 1.25rem;
+        }
+        
+        input[type="text"], input[type="url"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus, input[type="url"]:focus {
+            outline: none;
+            border-color: #FE2A5C;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 16px;
+            background: #E5E7EB;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FE2A5C 0%, #FF6B9D 100%);
+            transition: width 0.5s ease-out;
+            border-radius: 999px;
+        }
+        
+        .progress-stats {
+            text-align: center;
+        }
+        
+        .progress-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FE2A5C;
+            margin-bottom: 0.25rem;
+        }
+        
+        .progress-label {
+            font-size: 0.875rem;
+            color: #6B7280;
+            font-weight: 600;
+        }
+        
+        .file-upload-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload-card:hover {
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .file-status-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #FE2A5C, #FF6B9D);
+        }
+        
+        .file-status-bar.uploaded {
+            background: linear-gradient(90deg, #10B981, #34D399);
+        }
+        
+        .file-upload-content {
+            padding: 1.25rem;
+            text-align: center;
+        }
+        
+        .file-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(to bottom right, #FFF1F2, #FECDD3);
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.75rem;
+            font-size: 1.75rem;
+        }
+        
+        .file-title {
+            font-weight: bold;
+            color: #FE2A5C;
+            margin-bottom: 0.25rem;
+        }
+        
+        .file-subtitle {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-bottom: 0.75rem;
+        }
+        
+        .file-status {
+            margin-top: 0.75rem;
+        }
+        
+        .file-uploaded {
+            color: #10B981;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-name {
+            font-size: 0.75rem;
+            color: #10B981;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        
+        .file-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #9CA3AF;
+            font-size: 0.75rem;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .copy-section {
+            text-align: center;
+        }
+        
+        .ready-banner {
+            margin-bottom: 1rem;
+        }
+        
+        .ready-icon {
+            color: #10B981;
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .ready-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #1F2937;
+            margin-bottom: 0.25rem;
+        }
+        
+        .ready-desc {
+            font-size: 0.875rem;
+            color: #6B7280;
+        }
+        
+        .copy-button {
+            width: 100%;
+            background: linear-gradient(135deg, #FE2A5C 0%, #FF6B9D 100%);
+            color: white;
+            font-weight: bold;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            font-size: 1.125rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 10px 30px rgba(254, 42, 92, 0.3);
+            transition: transform 0.2s;
+            margin-bottom: 0.75rem;
+        }
+        
+        .copy-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .copy-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .copy-success {
+            background: #ECFDF5;
+            border: 2px solid #A7F3D0;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        
+        .copy-success-title {
+            color: #047857;
+            font-weight: bold;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .copy-success-desc {
+            color: #059669;
+            font-size: 0.75rem;
+        }
+        
+        .open-chat-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: white;
+            color: #FE2A5C;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            font-size: 1rem;
+        }
+        
+        .open-chat-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .progress-percent {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FE2A5C;
+            margin-left: auto;
+        }
+
+        .processing-indicator {
+            display: none;
+            background: #FEF3C7;
+            border: 2px solid #FCD34D;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin-top: 0.75rem;
+            text-align: center;
+        }
+
+        .processing-indicator.show {
+            display: block;
+        }
+
+        .processing-text {
+            color: #92400E;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+            }
+            
+            .process-arrow {
+                transform: rotate(90deg);
+                padding: 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">✈️</div>
+            <h1>Business Review Co-Pilot</h1>
+            <p>Upload. Copy. Generate. Done.</p>
+        </div>
+
+        <!-- Process Flow -->
+        <div class="card">
+            <div class="process-flow">
+                <div class="process-step">
+                    <div class="process-icon-wrapper">
+                        <div class="process-icon">📤</div>
+                        <div class="process-badge">1</div>
+                    </div>
+                    <div class="process-title">Upload</div>
+                    <div class="process-desc">Add files</div>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="process-icon-wrapper">
+                        <div class="process-icon">📋</div>
+                        <div class="process-badge">2</div>
+                    </div>
+                    <div class="process-title">Copy</div>
+                    <div class="process-desc">Copy data</div>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="process-icon-wrapper">
+                        <div class="process-icon">💬</div>
+                        <div class="process-badge">3</div>
+                    </div>
+                    <div class="process-title">Paste</div>
+                    <div class="process-desc">FCGPT chat</div>
+                </div>
+                <div class="process-arrow">→</div>
+                <div class="process-step">
+                    <div class="process-icon-wrapper">
+                        <div class="process-icon green">📄</div>
+                        <div class="process-badge green">4</div>
+                    </div>
+                    <div class="process-title green">Generate</div>
+                    <div class="process-desc">Print PDF</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Info & Progress -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">👥</div>
+                    <div class="card-title">Customer Details</div>
+                    <span class="checkmark" id="customerCheck" style="display:none;">✓</span>
+                </div>
+                <input type="text" id="customerName" placeholder="Customer Name *">
+                <input type="url" id="customerWebsite" placeholder="Website (optional)">
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div class="card-title">Progress</div>
+                    <div class="progress-percent" id="progressPercent">0%</div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div class="progress-stats">
+                    <div class="progress-number" id="fileCount">0/3</div>
+                    <div class="progress-label">Files Uploaded</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Uploads -->
+        <div class="grid-3">
+            <div class="file-upload-card" onclick="document.getElementById('accountPack').click()">
+                <div class="file-status-bar" id="accountPackBar"></div>
+                <div class="file-upload-content">
+                    <div class="file-icon">📈</div>
+                    <div class="file-title">Account Management Pack</div>
+                    <div class="file-subtitle">PowerBI</div>
+                    <div class="file-status" id="accountPackStatus">
+                        <div class="file-placeholder">
+                            <span>📤</span>
+                            <span>Click to upload</span>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="accountPack" accept=".pdf,.xlsx,.csv,.txt">
+            </div>
+
+            <div class="file-upload-card" onclick="document.getElementById('cheatsheet').click()">
+                <div class="file-status-bar" id="cheatsheetBar"></div>
+                <div class="file-upload-content">
+                    <div class="file-icon">📖</div>
+                    <div class="file-title">Team Cheatsheet</div>
+                    <div class="file-subtitle">Buddy List / Bible</div>
+                    <div class="file-status" id="cheatsheetStatus">
+                        <div class="file-placeholder">
+                            <span>📤</span>
+                            <span>Click to upload</span>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="cheatsheet" accept=".pdf,.xlsx,.csv,.txt,.doc,.docx">
+            </div>
+
+            <div class="file-upload-card" onclick="document.getElementById('roiDoc').click()">
+                <div class="file-status-bar" id="roiDocBar"></div>
+                <div class="file-upload-content">
+                    <div class="file-icon">📊</div>
+                    <div class="file-title">ROI Document</div>
+                    <div class="file-subtitle">PowerBI</div>
+                    <div class="file-status" id="roiDocStatus">
+                        <div class="file-placeholder">
+                            <span>📤</span>
+                            <span>Click to upload</span>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="roiDoc" accept=".pdf,.xlsx,.csv,.txt">
+            </div>
+        </div>
+
+        <!-- Copy Button -->
+        <div class="card">
+            <div class="copy-section">
+                <div class="ready-banner" id="readyBanner" style="display:none;">
+                    <div class="ready-icon">✓</div>
+                    <div class="ready-title">Ready to Generate!</div>
+                    <div class="ready-desc">Copy relevant data & paste into FCGPT</div>
+                </div>
+                
+                <button class="copy-button" id="copyButton" onclick="copyAllData()">
+                    <span>📋</span>
+                    <span id="copyButtonText">Copy Relevant Data</span>
+                </button>
+
+                <div class="processing-indicator" id="processingIndicator">
+                    <div class="processing-text">⏳ Extracting relevant data...</div>
+                </div>
+                
+                <div class="copy-success" id="copySuccess" style="display:none;">
+                    <div class="copy-success-title">✓ Data Copied!</div>
+                    <div class="copy-success-desc">Open FCGPT below and paste your data</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Chat Button -->
+        <div class="text-center">
+            <a href="https://chat.fctg.ai/c/new?agent_id=agent_9a0SDq5QmJ5XncU5Nr88w" target="_blank" class="open-chat-button">
+                <span>💬</span>
+                <span>Open FCGPT Business Review Chat</span>
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set PDF.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        let files = {
+            accountPack: null,
+            cheatsheet: null,
+            roiDoc: null
+        };
+
+        let fileContents = {
+            accountPack: '',
+            cheatsheet: '',
+            roiDoc: ''
+        };
+
+        // Update progress
+        function updateProgress() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const hasCustomer = customerName !== '';
+            const uploadedCount = Object.values(files).filter(f => f !== null).length;
+            const total = hasCustomer ? 1 : 0;
+            const progress = ((total + uploadedCount) / 4) * 100;
+            
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+            document.getElementById('fileCount').textContent = uploadedCount + '/3';
+            
+            // Show checkmark if customer name filled
+            document.getElementById('customerCheck').style.display = hasCustomer ? 'inline' : 'none';
+            
+            // Show ready banner if complete
+            const isReady = hasCustomer && uploadedCount === 3;
+            document.getElementById('readyBanner').style.display = isReady ? 'block' : 'none';
+        }
+
+        // Customer name input
+        document.getElementById('customerName').addEventListener('input', updateProgress);
+        document.getElementById('customerWebsite').addEventListener('input', updateProgress);
+
+        // File upload handlers
+        document.getElementById('accountPack').addEventListener('change', function(e) {
+            handleFileUpload('accountPack', e.target.files[0]);
+        });
+
+        document.getElementById('cheatsheet').addEventListener('change', function(e) {
+            handleFileUpload('cheatsheet', e.target.files[0]);
+        });
+
+        document.getElementById('roiDoc').addEventListener('change', function(e) {
+            handleFileUpload('roiDoc', e.target.files[0]);
+        });
+
+        // Handle file upload and extract content
+        async function handleFileUpload(fileType, file) {
+            if (file) {
+                files[fileType] = file;
+                const bar = document.getElementById(fileType + 'Bar');
+                const status = document.getElementById(fileType + 'Status');
+                
+                bar.classList.add('uploaded');
+                status.innerHTML = `
+                    <div class="file-uploaded">✓</div>
+                    <div class="file-name">${file.name}</div>
+                `;
+                
+                // Extract file content
+                try {
+                    const content = await extractFileContent(file);
+                    fileContents[fileType] = content;
+                } catch (error) {
+                    console.error('Error extracting file content:', error);
+                    fileContents[fileType] = `[Error reading ${file.name}: ${error.message}]`;
+                }
+                
+                updateProgress();
+            }
+        }
+
+        // Extract content from different file types
+        async function extractFileContent(file) {
+            const fileName = file.name.toLowerCase();
+            
+            // Handle PDFs with PDF.js
+            if (fileName.endsWith('.pdf')) {
+                return await extractPDFContent(file);
+            }
+            
+            // Handle Excel files
+            if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+                return await extractExcelContent(file);
+            }
+            
+            // Handle CSV and text files
+            if (fileName.endsWith('.csv') || fileName.endsWith('.txt')) {
+                return await extractTextContent(file);
+            }
+            
+            // Default: try to read as text
+            return await extractTextContent(file);
+        }
+
+        // Extract PDF content using PDF.js
+        async function extractPDFContent(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                let fullText = '';
+                
+                // Extract text from each page
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    const textContent = await page.getTextContent();
+                    
+                    // Combine text items with proper spacing
+                    const pageText = textContent.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n\n';
+                }
+                
+                return fullText.trim();
+            } catch (error) {
+                console.error('PDF extraction error:', error);
+                throw new Error('Could not extract PDF content. Please ensure it is a text-based PDF.');
+            }
+        }
+
+        // Extract Excel content
+        async function extractExcelContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        let output = '';
+                        
+                        // Process each sheet
+                        workbook.SheetNames.forEach(sheetName => {
+                            const worksheet = workbook.Sheets[sheetName];
+                            
+                            // Convert to JSON for better structure
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                            
+                            output += `\n=== SHEET: ${sheetName} ===\n\n`;
+                            
+                            // Format as structured data
+                            jsonData.forEach(row => {
+                                const rowText = row.filter(cell => cell !== '').join(' | ');
+                                if (rowText.trim()) {
+                                    output += rowText + '\n';
+                                }
+                            });
+                            
+                            output += '\n';
+                        });
+                        
+                        resolve(output);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Extract text content
+        async function extractTextContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        // Smart filter for cheatsheet - extract only relevant customer data
+        function filterCheatsheetData(content, customerName) {
+            if (!customerName || !content) return content;
+            
+            const lines = content.split('\n');
+            const relevantLines = [];
+            const customerLower = customerName.toLowerCase();
+            let contextBuffer = [];
+            const contextSize = 5; // Lines before and after match
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                const lineLower = line.toLowerCase();
+                
+                // Check if line contains customer name
+                if (lineLower.includes(customerLower)) {
+                    // Add context before
+                    relevantLines.push(...contextBuffer);
+                    relevantLines.push(line);
+                    
+                    // Add context after
+                    for (let j = 1; j <= contextSize && i + j < lines.length; j++) {
+                        relevantLines.push(lines[i + j]);
+                    }
+                    
+                    contextBuffer = [];
+                    i += contextSize; // Skip ahead
+                } else {
+                    // Keep a rolling buffer of context
+                    contextBuffer.push(line);
+                    if (contextBuffer.length > contextSize) {
+                        contextBuffer.shift();
+                    }
+                }
+            }
+            
+            // If we found relevant data, return it; otherwise return full content
+            return relevantLines.length > 0 ? relevantLines.join('\n') : content;
+        }
+
+        // Extract key travel metrics from Account Pack
+        function extractTravelMetrics(content) {
+            const lines = content.split('\n');
+            const structuredData = {
+                summary: [],
+                spend: [],
+                bookings: [],
+                destinations: [],
+                airlines: [],
+                hotels: [],
+                metrics: []
+            };
+            
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                
+                const lineLower = trimmed.toLowerCase();
+                
+                // Summary/totals
+                if (lineLower.match(/total|summary|overview|period/)) {
+                    structuredData.summary.push(trimmed);
+                }
+                // Spend data
+                else if (lineLower.match(/\$|spend|revenue|cost|fee|price|savings/)) {
+                    structuredData.spend.push(trimmed);
+                }
+                // Booking counts
+                else if (lineLower.match(/booking|transaction|trip|count|volume/)) {
+                    structuredData.bookings.push(trimmed);
+                }
+                // Destinations
+                else if (lineLower.match(/destination|city|location|route|domestic|international|trans-tasman/)) {
+                    structuredData.destinations.push(trimmed);
+                }
+                // Airlines
+                else if (lineLower.match(/airline|carrier|qantas|virgin|jetstar|air|flight/)) {
+                    structuredData.airlines.push(trimmed);
+                }
+                // Hotels
+                else if (lineLower.match(/hotel|accommodation|night|room|stay/)) {
+                    structuredData.hotels.push(trimmed);
+                }
+                // Other metrics (lines with numbers that aren't metadata)
+                else if (trimmed.match(/\d+/) && !lineLower.match(/page|sheet|row|column|^[0-9]+$/)) {
+                    structuredData.metrics.push(trimmed);
+                }
+            }
+            
+            return structuredData;
+        }
+
+        // Format metrics for output in AI-friendly format
+        function formatMetrics(data) {
+            let output = '';
+            
+            if (data.summary.length > 0) {
+                output += '\nSUMMARY:\n';
+                data.summary.slice(0, 20).forEach(line => output += `- ${line}\n`);
+            }
+            
+            if (data.spend.length > 0) {
+                output += '\nSPEND DATA:\n';
+                data.spend.slice(0, 40).forEach(line => output += `- ${line}\n`);
+            }
+            
+            if (data.bookings.length > 0) {
+                output += '\nBOOKING DATA:\n';
+                data.bookings.slice(0, 30).forEach(line => output += `- ${line}\n`);
+            }
+            
+            if (data.destinations.length > 0) {
+                output += '\nDESTINATIONS:\n';
+                data.destinations.slice(0, 30).forEach(line => output += `- ${line}\n`);
+            }
+            
+            if (data.airlines.length > 0) {
+                output += '\nAIRLINES:\n';
+                data.airlines.slice(0, 20).forEach(line => output += `- ${line}\n`);
+            }
+            
+            if (data.hotels.length > 0) {
+                output += '\nHOTEL DATA:\n';
+                data.hotels.slice(0, 20).forEach(line => output += `- ${line}\n`);
+            }
+            
+            if (data.metrics.length > 0) {
+                output += '\nOTHER METRICS:\n';
+                data.metrics.slice(0, 30).forEach(line => output += `- ${line}\n`);
+            }
+            
+            return output;
+        }
+
+        // Copy all relevant data to clipboard
+        async function copyAllData() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerWebsite = document.getElementById('customerWebsite').value;
+            
+            if (!customerName) {
+                alert('Please enter a customer name first!');
+                return;
+            }
+            
+            // Show processing indicator
+            document.getElementById('processingIndicator').classList.add('show');
+            document.getElementById('copyButton').disabled = true;
+            document.getElementById('copyButtonText').textContent = 'Processing...';
+            
+            // Small delay to show processing state
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            let output = `CUSTOMER: ${customerName}\n`;
+            if (customerWebsite) output += `WEBSITE: ${customerWebsite}\n`;
+            output += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            
+            // Process Account Management Pack
+            if (files.accountPack && fileContents.accountPack) {
+                output += `\n📊 ACCOUNT MANAGEMENT PACK - TRAVEL DATA\n`;
+                output += `SOURCE: ${files.accountPack.name}\n`;
+                const metrics = extractTravelMetrics(fileContents.accountPack);
+                output += formatMetrics(metrics);
+                output += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+            
+            // Process Cheatsheet
+            if (files.cheatsheet && fileContents.cheatsheet) {
+                output += `\n📖 CUSTOMER INTELLIGENCE - CHEATSHEET\n`;
+                output += `SOURCE: ${files.cheatsheet.name}\n\n`;
+                const filtered = filterCheatsheetData(fileContents.cheatsheet, customerName);
+                output += filtered;
+                output += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+            
+            // Process ROI Doc
+            if (files.roiDoc && fileContents.roiDoc) {
+                output += `\n📈 ROI & PERFORMANCE DATA\n`;
+                output += `SOURCE: ${files.roiDoc.name}\n`;
+                const metrics = extractTravelMetrics(fileContents.roiDoc);
+                output += formatMetrics(metrics);
+                output += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+            }
+            
+            output += `\nPlease analyze this data and create a comprehensive Business Review for ${customerName}.`;
+            
+            try {
+                await navigator.clipboard.writeText(output);
+                
+                document.getElementById('processingIndicator').classList.remove('show');
+                document.getElementById('copyButtonText').textContent = '✓ Copied Relevant Data!';
+                document.getElementById('copySuccess').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('copyButton').disabled = false;
+                    document.getElementById('copyButtonText').textContent = 'Copy Relevant Data';
+                    document.getElementById('copySuccess').style.display = 'none';
+                }, 3000);
+            } catch (error) {
+                console.error('Copy failed:', error);
+                alert('Failed to copy to clipboard. Please try again.');
+                document.getElementById('processingIndicator').classList.remove('show');
+                document.getElementById('copyButton').disabled = false;
+                document.getElementById('copyButtonText').textContent = 'Copy Relevant Data';
+            }
+        }
+    </script>
+</body>
+</html>
